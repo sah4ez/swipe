@@ -129,6 +129,10 @@ func Service(iface interface{}, opts ...ServiceOption) Option {
 	return "implementation not generated, run swipe"
 }
 
+func JS(iface interface{}, opts ...ServiceOption) Option {
+	return "implementation not generated, run swipe"
+}
+
 // Name override service name prefix.
 func Name(string) ServiceOption {
 	return "implementation not generated, run swipe"
@@ -197,6 +201,21 @@ func JSONRPC(...JSONRPCOption) TransportOption {
 
 // JSONRPCPath sets the end point for transport.
 func JSONRPCPath(string) JSONRPCOption {
+	return "implementation not generated, run swipe"
+}
+
+// JSONRPCHeaderVars load field to request from http headers if available
+func JSONRPCHeaderVars([]string) JSONRPCOption {
+	return "implementation not generated, run swipe"
+}
+
+// JSONRPCMapVarsToTags mapper field of struct to tags
+func JSONRPCMapVarsToTags([]string) JSONRPCOption {
+	return "implementation not generated, run swipe"
+}
+
+// JSONRPCSkipMethod array skipped methods
+func JSONRPCSkipMethods([]string) JSONRPCOption {
 	return "implementation not generated, run swipe"
 }
 

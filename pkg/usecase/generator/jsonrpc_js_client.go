@@ -122,7 +122,11 @@ func (g *jsonRPCJSClient) Process(_ context.Context) error {
 	g.W("export default class extends JSONRPCClient {\n")
 
 	for _, m := range g.o.Methods {
+		if _, ok := g.o.Transport.JsonRPC.SkipMethods[m.Name]; ok {
+			continue
+		}
 		mopt := g.o.Transport.MethodOptions[m.Name]
+		headerVars := g.o.Transport.JsonRPC.HeaderVars
 		g.W("/**\n")
 
 		if len(m.Comments) > 0 {
@@ -133,6 +137,9 @@ func (g *jsonRPCJSClient) Process(_ context.Context) error {
 		}
 
 		for _, p := range m.Params {
+			if _, ok := headerVars[p.Name()]; ok {
+				continue
+			}
 			g.W("* @param {%s} %s\n", g.getJSDocType(p.Type(), 0), p.Name())
 		}
 
@@ -164,8 +171,13 @@ func (g *jsonRPCJSClient) Process(_ context.Context) error {
 		g.W("**/\n")
 		g.W("%s(", m.LcName)
 
+		skipCommans := 0
 		for i, p := range m.Params {
-			if i > 0 {
+			if _, ok := headerVars[p.Name()]; ok {
+				skipCommans++
+				continue
+			}
+			if i-skipCommans > 0 {
 				g.W(",")
 			}
 			g.W(p.Name())
@@ -174,11 +186,22 @@ func (g *jsonRPCJSClient) Process(_ context.Context) error {
 		g.W(") {\n")
 		g.W("return this.__scheduleRequest(\"%s\", {", m.LcName)
 
+		skipCommans = 0
 		for i, p := range m.Params {
-			if i > 0 {
+			if _, ok := headerVars[p.Name()]; ok {
+				skipCommans++
+				continue
+			}
+			if i-skipCommans > 0 {
 				g.W(",")
 			}
-			g.W("%[1]s:%[1]s", p.Name())
+
+			mapped := p.Name()
+			if v, ok := g.o.Transport.JsonRPC.MapVarsToTags[mapped]; ok {
+				mapped = v
+			}
+
+			g.W("%s:%s", mapped, p.Name())
 		}
 
 		g.W("})\n")
@@ -243,6 +266,10 @@ func (g *jsonRPCJSClient) Filename() string {
 	return g.filename
 }
 
+func (g *jsonRPCJSClient) String() string {
+	return g.Buffer.String()
+}
+
 func (g *jsonRPCJSClient) getJSDocType(t stdtypes.Type, nested int) string {
 	switch v := t.(type) {
 	default:
@@ -260,7 +287,8 @@ func (g *jsonRPCJSClient) getJSDocType(t stdtypes.Type, nested int) string {
 		case "encoding/json.RawMessage":
 			return "*"
 		case "github.com/pborman/uuid.UUID",
-			"github.com/google/uuid.UUID":
+			"github.com/google/uuid.UUID",
+			"github.com/seniorGolang/gokit/types/uuid.UUID":
 			return "string"
 		case "time.Time":
 			return "string"

@@ -35,8 +35,11 @@ type WrapResponseHTTPTransportOption struct {
 }
 
 type JsonRPCHTTPTransportOption struct {
-	Enable bool
-	Path   string
+	Enable        bool
+	Path          string
+	HeaderVars    map[string]struct{}
+	MapVarsToTags map[string]string
+	SkipMethods   map[string]struct{}
 }
 
 type MethodHTTPTransportOption struct {

@@ -9,12 +9,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net/url"
+
 	"github.com/go-kit/kit/endpoint"
 	"github.com/l-vitaly/go-kit/transport/http/jsonrpc"
 	"github.com/pquerna/ffjson/ffjson"
 	"github.com/swipe-io/swipe/fixtures/service"
 	"github.com/swipe-io/swipe/fixtures/user"
-	"net/url"
 )
 
 type SwipeClientOption func(*clientSwipe)
@@ -115,8 +116,8 @@ func (c *clientSwipe) Delete(ctx context.Context, id uint) (_ string, _ string, 
 	return response.A, response.B, nil
 }
 
-func (c *clientSwipe) Get(ctx context.Context, id int, name string, fname string, price float32, n int, b int, c int) (_ user.User, _ error) {
-	resp, err := c.getEndpoint(ctx, getRequestSwipe{Id: id, Name: name, Fname: fname, Price: price, N: n, B: b, C: c})
+func (c *clientSwipe) Get(ctx context.Context, id int, name string, fname string, price float32, n int, b int, d int) (_ user.User, _ error) {
+	resp, err := c.getEndpoint(ctx, getRequestSwipe{Id: id, Name: name, Fname: fname, Price: price, N: n, B: b, C: d})
 	if err != nil {
 		return user.User{}, err
 	}

@@ -313,6 +313,28 @@ func (g *serviceOption) loadTransport(opt *parser.Option) (option model.Transpor
 		if path, ok := jsonRpcOpt.At("JSONRPCPath"); ok {
 			option.JsonRPC.Path = path.Value.String()
 		}
+		if headerVars, ok := jsonRpcOpt.At("JSONRPCHeaderVars"); ok {
+			values := headerVars.Value.StringSlice()
+			option.JsonRPC.HeaderVars = map[string]struct{}{}
+			for _, v := range values {
+				option.JsonRPC.HeaderVars[v] = struct{}{}
+			}
+		}
+		if mapVars, ok := jsonRpcOpt.At("JSONRPCMapVarsToTags"); ok {
+			option.JsonRPC.MapVarsToTags = map[string]string{}
+			values := mapVars.Value.StringSlice()
+
+			for i := 0; i < len(values); i += 2 {
+				option.JsonRPC.MapVarsToTags[values[i]] = values[i+1]
+			}
+		}
+		if methods, ok := jsonRpcOpt.At("JSONRPCSkipMethods"); ok {
+			values := methods.Value.StringSlice()
+			option.JsonRPC.SkipMethods = map[string]struct{}{}
+			for _, v := range values {
+				option.JsonRPC.SkipMethods[v] = struct{}{}
+			}
+		}
 	}
 	if methodDefaultOpt, ok := opt.At("MethodDefaultOptions"); ok {
 		defaultMethodOptions, err := getMethodOptions(methodDefaultOpt, model.MethodHTTPTransportOption{})

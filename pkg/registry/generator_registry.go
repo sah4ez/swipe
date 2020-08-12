@@ -18,6 +18,8 @@ func (r *Registry) Option(name string, info model.GenerateInfo) uo.Option {
 		return io.NewConfigOption()
 	case "Service":
 		return io.NewServiceOption(info)
+	case "JS":
+		return io.NewServiceOption(info)
 	}
 	return nil
 }
@@ -30,6 +32,8 @@ func (r *Registry) Processor(name string, info model.GenerateInfo) (up.Processor
 		return up.NewConfig(info), nil
 	case "Service":
 		return up.NewService(info), nil
+	case "JS":
+		return up.NewJsClient(info), nil
 	}
 	return nil, nil
 }
